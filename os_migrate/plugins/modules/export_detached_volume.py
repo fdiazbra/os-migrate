@@ -115,12 +115,12 @@ def run_module():
     sdk_volume = conn.block_storage.get_volume(module.params['volume_id'])
     data = server_volume.ServerVolume.from_sdk(conn, sdk_volume)
 
-    if (not sdk_volume['attachments'] ):
-      result['changed'] = filesystem.write_or_replace_resource(
-          module.params['path'], data)
-    else :
-      result['failed'] = True
-      result['errors'] = "Volume "+ module.params['volume_id'] +" is not detached"
+    if (not sdk_volume['attachments']):
+        result['changed'] = filesystem.write_or_replace_resource(
+            module.params['path'], data)
+    else:
+        result['failed'] = True
+        result['errors'] = "Volume " + module.params['volume_id'] + " is not detached"
 
     module.exit_json(**result)
 

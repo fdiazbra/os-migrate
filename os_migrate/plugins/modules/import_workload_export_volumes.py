@@ -248,13 +248,11 @@ except ImportError:
         import openstack_full_argument_spec, openstack_cloud_from_module
 
 from ansible_collections.os_migrate.os_migrate.plugins.module_utils \
-    import exc, server
+    import server
 
 from ansible_collections.os_migrate.os_migrate.plugins.module_utils.volume_common \
-    import use_lock, ATTACH_LOCK_FILE_SOURCE, DEFAULT_TIMEOUT, OpenStackVolumeBase
+    import DEFAULT_TIMEOUT, OpenStackVolumeBase
 
-import subprocess
-import time
 import uuid
 
 
@@ -343,6 +341,7 @@ class OpenStackSourceVolume(OpenStackVolumeBase):
                 size=volume['size'], port=None, url=None, progress=None,
                 bootable=volume['bootable'])
             self._update_progress(dev_path, 0.0)
+
 
 def run_module():
     argument_spec = openstack_full_argument_spec(
