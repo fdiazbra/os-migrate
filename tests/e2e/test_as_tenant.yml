@@ -232,6 +232,7 @@
           tags:
             - test_workload_multi_volume_migration
             - test_image_workload_boot_copy
+            - test_detached_volumes
       tags: always
       vars:
         workload_image: "{{ os_migrate_src_osm_server_image }}"
