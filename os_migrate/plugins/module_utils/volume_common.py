@@ -288,7 +288,7 @@ class OpenStackVolumeBase():
                                              stderr=subprocess.STDOUT,
                                              stdin=DEVNULL,
                                              universal_newlines=True, bufsize=1)
-                flags = fcntl.fcntl(img_sub.stdout,fcntl.F_GETFL)
+                flags = fcntl.fcntl(img_sub.stdout, fcntl.F_GETFL)
                 flags |= os.O_NONBLOCK
                 fcntl.fcntl(img_sub.stdout, fcntl.F_SETFL, flags)
                 buf = b''
@@ -364,7 +364,7 @@ class OpenStackVolumeBase():
 
     def prepare_exports(self):
         """
-        Prepare the volumes to be exported. This method needs to be implemented in the 
+        Prepare the volumes to be exported. This method needs to be implemented in the
         class that exports the VM or the list of detached volumes
         """
         raise NotImplementedError("Please Implement this method")
