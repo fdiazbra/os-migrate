@@ -289,18 +289,11 @@ except ImportError:
         import openstack_full_argument_spec, openstack_cloud_from_module
 
 from ansible_collections.os_migrate.os_migrate.plugins.module_utils import server
-from ansible_collections.os_migrate.os_migrate.plugins.module_utils.server_volume \
-    import ServerVolume
 
 from ansible_collections.os_migrate.os_migrate.plugins.module_utils.volume_common \
-    import OpenStackVolumeBase, RemoteShell, use_lock, ATTACH_LOCK_FILE_DESTINATION, DEFAULT_TIMEOUT, DEVNULL
+    import OpenStackVolumeBase, DEFAULT_TIMEOUT
 
-import errno
-import fcntl
-import os
 import re
-import subprocess
-import time
 
 
 class OpenStackDestinationVolume(OpenStackVolumeBase):
@@ -347,6 +340,7 @@ class OpenStackDestinationVolume(OpenStackVolumeBase):
         finally:
             self._stop_forwarding_process()
             self._release_ports()
+
 
 def run_module():
     argument_spec = openstack_full_argument_spec(

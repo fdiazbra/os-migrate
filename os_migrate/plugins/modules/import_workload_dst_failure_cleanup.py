@@ -151,9 +151,7 @@ except ImportError:
 from ansible_collections.os_migrate.os_migrate.plugins.module_utils import server
 
 from ansible_collections.os_migrate.os_migrate.plugins.module_utils.volume_common \
-    import use_lock, ATTACH_LOCK_FILE_DESTINATION, DEFAULT_TIMEOUT, OpenStackVolumeBase
-
-import time
+    import DEFAULT_TIMEOUT, OpenStackVolumeBase
 
 
 class OpenStackDstFailureCleanup(OpenStackVolumeBase):

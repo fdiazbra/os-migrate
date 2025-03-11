@@ -271,10 +271,7 @@ except ImportError:
 from ansible_collections.os_migrate.os_migrate.plugins.module_utils import server
 
 from ansible_collections.os_migrate.os_migrate.plugins.module_utils.volume_common \
-    import use_lock, ATTACH_LOCK_FILE_SOURCE, DEFAULT_TIMEOUT, OpenStackVolumeBase
-
-import subprocess
-import time
+    import DEFAULT_TIMEOUT, OpenStackVolumeBase
 
 
 class OpenStackSourceHostCleanup(OpenStackVolumeBase):
@@ -307,6 +304,7 @@ class OpenStackSourceHostCleanup(OpenStackVolumeBase):
         for path, mapping in volume_map.items():
             port = mapping['port']
             self.claimed_ports.append(port)
+
 
 def run_module():
     argument_spec = openstack_full_argument_spec(

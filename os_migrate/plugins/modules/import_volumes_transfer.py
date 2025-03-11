@@ -287,18 +287,10 @@ except ImportError:
     # If this fails fall back to ansible < 3 imports
     from ansible.module_utils.openstack \
         import openstack_full_argument_spec, openstack_cloud_from_module
-
-from ansible_collections.os_migrate.os_migrate.plugins.module_utils import server
-from ansible_collections.os_migrate.os_migrate.plugins.module_utils.server_volume \
-    import ServerVolume
-
 from ansible_collections.os_migrate.os_migrate.plugins.module_utils.volume_common \
-    import OpenStackVolumeBase, RemoteShell, use_lock, ATTACH_LOCK_FILE_DESTINATION, DEFAULT_TIMEOUT, DEVNULL
+    import OpenStackVolumeBase, DEFAULT_TIMEOUT
 
-import os
 import re
-import subprocess
-import time
 
 
 class OpenStackDestinationVolume(OpenStackVolumeBase):
@@ -334,15 +326,16 @@ class OpenStackDestinationVolume(OpenStackVolumeBase):
         self.forwarding_process_command = None
 
     def transfer_exports(self):
-      try:
-          self._create_forwarding_process()
-          self._create_destination_volumes()
-          self._attach_destination_volumes()
-          self._convert_destination_volumes()
-          self._detach_destination_volumes()
-      finally:
-          self._stop_forwarding_process()
-          self._release_ports()
+        try:
+            self._create_forwarding_process()
+            self._create_destination_volumes()
+            self._attach_destination_volumes()
+            self._convert_destination_volumes()
+            self._detach_destination_volumes()
+        finally:
+            self._stop_forwarding_process()
+            self._release_ports()
+
 
 def run_module():
     argument_spec = openstack_full_argument_spec(
@@ -367,9 +360,6 @@ def run_module():
     )
 
     sdk, conn = openstack_cloud_from_module(module)
-    # volume = conn.block_storage.get_volume(module.params['data']['_info']['id'])
-    # volume = ServerVolume.from_data(module.params['data'])
-    #ser_server = server.Server.from_data(module.params['data'])
 
     # Required parameters
     destination_conversion_host_id = module.params['conversion_host']['id']

@@ -268,7 +268,7 @@ class OpenStackSourceVolume(OpenStackVolumeBase):
             source_conversion_host_id,
             ssh_key_path,
             ssh_user,
-            transfer_uuid=transfer_uuid ,
+            transfer_uuid=transfer_uuid,
             conversion_host_address=source_conversion_host_address,
             state_file=state_file,
             log_file=log_file,
@@ -308,15 +308,16 @@ class OpenStackSourceVolume(OpenStackVolumeBase):
         order on the destination.
         """
         for s_volume in self.volume_list:
-          volume = self.conn.get_volume_by_id(s_volume['_info']['id'])
-          self.log.info('Inspecting volume: %s', volume['id'])
-          dev_path = volume['id']
-          self.volume_map[dev_path] = dict(
-              source_dev=None, source_id=volume['id'], dest_dev=None,
-              dest_id=None, snap_id=None, image_id=None, name=volume['name'],
-              size=volume['size'], port=None, url=None, progress=None,
-              bootable=volume['bootable'])
-          self._update_progress(dev_path, 0.0)
+            volume = self.conn.get_volume_by_id(s_volume['_info']['id'])
+            self.log.info('Inspecting volume: %s', volume['id'])
+            dev_path = volume['id']
+            self.volume_map[dev_path] = dict(
+                source_dev=None, source_id=volume['id'], dest_dev=None,
+                dest_id=None, snap_id=None, image_id=None, name=volume['name'],
+                size=volume['size'], port=None, url=None, progress=None,
+                bootable=volume['bootable'])
+            self._update_progress(dev_path, 0.0)
+
 
 def run_module():
     argument_spec = openstack_full_argument_spec(
