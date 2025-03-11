@@ -13,10 +13,10 @@
       src_volumes_info.volumes
         | os_migrate.os_migrate.stringfilter(os_migrate_volumes_filter,
                                              attribute='name')
-        | selectattr('status', '!=' , 'in-use') 
+        | selectattr('status', '!=' , 'in-use')
         | json_query('[*].{name: name, id: id}')
         | sort(attribute='id')
- ) }}"
+        ) }}"
 
 - name: export detached volumes
   os_migrate.os_migrate.export_detached_volume:
