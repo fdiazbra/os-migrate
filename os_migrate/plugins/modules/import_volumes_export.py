@@ -247,20 +247,11 @@ except ImportError:
     from ansible.module_utils.openstack \
         import openstack_full_argument_spec, openstack_cloud_from_module
 
-from ansible_collections.os_migrate.os_migrate.plugins.module_utils \
-    import exc, server
-
 from ansible_collections.os_migrate.os_migrate.plugins.module_utils.volume_common \
-    import use_lock, ATTACH_LOCK_FILE_SOURCE, DEFAULT_TIMEOUT, OpenStackVolumeBase
+    import DEFAULT_TIMEOUT, OpenStackVolumeBase
 
-from ansible_collections.os_migrate.os_migrate.plugins.module_utils.server_volume \
-    import ServerVolume
-
-import subprocess
-import time
 import uuid
 import os
-import logging
 
 
 class OpenStackSourceVolume(OpenStackVolumeBase):
@@ -301,22 +292,22 @@ class OpenStackSourceVolume(OpenStackVolumeBase):
         self.volume_list = volume_list
 
     def prepare_exports(self):
-      """
-      Attach the source volume to the source conversion host, and start
-      waiting for NBD connections.
-      """
-      self._get_root_and_data_volumes()
-      self.log.info('Data in the volume: %s', self.volume_list)
-      self._attach_volumes_to_converter()
-      self._export_volumes_from_converter()
+        """
+        Attach the source volume to the source conversion host, and start
+        waiting for NBD connections.
+        """
+        self._get_root_and_data_volumes()
+        self.log.info('Data in the volume: %s', self.volume_list)
+        self._attach_volumes_to_converter()
+        self._export_volumes_from_converter()
 
     def _get_root_and_data_volumes(self):
-      """
-      Volume mapping step one: get the IDs and sizes of all volumes on the
-      source VM. Key off the original device path to eventually preserve this
-      order on the destination.
-      """
-      for s_volume in self.volume_list:
+        """
+        Volume mapping step one: get the IDs and sizes of all volumes on the
+        source VM. Key off the original device path to eventually preserve this
+        order on the destination.
+        """
+        for s_volume in self.volume_list:
           volume = self.conn.get_volume_by_id(s_volume['_info']['id'])
           self.log.info('Inspecting volume: %s', volume['id'])
           dev_path = volume['id']
