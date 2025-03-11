@@ -23,6 +23,7 @@
       vars:
         os_migrate_workloads_filter:
           - regex: '^osm_detached_volume'
+      tags: test_detached_volumes
 
     - name: set boot disk copy
       ansible.builtin.replace:
@@ -65,6 +66,7 @@
     - name: import detached volumes
       ansible.builtin.include_role:
         name: os_migrate.os_migrate.import_detached_volumes
+      tags: test_detached_volumes
 
     - name: import workloads
       ansible.builtin.include_role:
