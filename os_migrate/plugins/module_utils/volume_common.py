@@ -3,6 +3,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 from ansible_collections.os_migrate.os_migrate.plugins.module_utils.server_volume \
     import ServerVolume
+from ansible_collections.os_migrate.os_migrate.plugins.module_utils import exc
 import json
 import logging
 import os
@@ -122,7 +123,7 @@ class OpenStackVolumeBase():
 
     def transfer_exports(self):
         """
-        Method to transfer volumes. This method needs to be implemented in the 
+        Method to transfer volumes. This method needs to be implemented in the
         class that transfers the VM or the list of detached volumes
         """
         raise NotImplementedError("Please Implement this method")
@@ -200,7 +201,6 @@ class OpenStackVolumeBase():
         """
         self.log.info('Creating volumes on destination cloud')
         for path, mapping in self.volume_map.items():
-            source_id = mapping['source_id']
             sdk_params = {
                 'name': mapping['name'],
                 'bootable': mapping['bootable'],
@@ -288,7 +288,7 @@ class OpenStackVolumeBase():
                                              stderr=subprocess.STDOUT,
                                              stdin=DEVNULL,
                                              universal_newlines=True, bufsize=1)
-                flags = fcntl.fcntl(img_sub.stdout, fcntl.F_GETFL)
+                flags = fcntl.fcntl(img_sub.stdout,fcntl.F_GETFL)
                 flags |= os.O_NONBLOCK
                 fcntl.fcntl(img_sub.stdout, fcntl.F_SETFL, flags)
                 buf = b''
@@ -403,7 +403,7 @@ class OpenStackVolumeBase():
         """
         Volume mapping step one: get the IDs and sizes of all volumes.
         Key off the original device path to eventually preserve this
-        order on the destination. This method needs to be implemented in the 
+        order on the destination. This method needs to be implemented in the
         class that exports the VM or the list of detached volumes
         """
         raise NotImplementedError("Please Implement this method")
@@ -614,7 +614,6 @@ class OpenStackVolumeBase():
             self.log.info('Deleting volume %s.', volume['id'])
             self.conn.delete_volume(volume['id'], timeout=self.timeout, wait=True)
 
-
     def close_exports(self):
         """ Put the source VM's volumes back where they were. """
         self._converter_close_exports()
@@ -639,13 +638,6 @@ class OpenStackVolumeBase():
             self.log.debug('Unable to get remote NBD PID! %s', str(err))
 
         self._release_ports()
-
-    def _volume_still_attached(self, volume, vm):
-        """ Check if a volume is still attached to a VM. """
-        for attachment in volume.attachments:
-            if attachment['server_id'] == vm.id:
-                return True
-        return False
 
     @use_lock(ATTACH_LOCK_FILE_SOURCE)
     def _detach_volumes_from_source_converter(self):
