@@ -42,4 +42,3 @@
   register: transfer
   when:
     - item["_migration_params"]["data_copy"]|default(true)
-
