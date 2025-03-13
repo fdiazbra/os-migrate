@@ -21,7 +21,7 @@
       ansible.builtin.include_role:
         name: os_migrate.os_migrate.export_detached_volumes
       vars:
-        os_migrate_workloads_filter:
+        os_migrate_volumes_filter:
           - regex: '^osm_detached_volume'
       when: test_detached_volumes|default(false)|bool
 
