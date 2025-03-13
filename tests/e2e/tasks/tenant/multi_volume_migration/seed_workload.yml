@@ -27,7 +27,7 @@
     ca_cert: "{{ os_migrate_src_ca_cert|default(omit) }}"
     client_cert: "{{ os_migrate_src_client_cert|default(omit) }}"
     client_key: "{{ os_migrate_src_client_key|default(omit) }}"
-  tags: test_detached_volumes
+  when: test_detached_volumes|default(false)|bool
 
 - name: Create osm_server
   openstack.cloud.server:
