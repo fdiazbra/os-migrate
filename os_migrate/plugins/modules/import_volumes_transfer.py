@@ -288,12 +288,12 @@ except ImportError:
     from ansible.module_utils.openstack \
         import openstack_full_argument_spec, openstack_cloud_from_module
 from ansible_collections.os_migrate.os_migrate.plugins.module_utils.volume_common \
-    import OpenStackVolumeBase, DEFAULT_TIMEOUT
+    import OpenstackVolumeTransfer, DEFAULT_TIMEOUT
 
 import re
 
 
-class OpenStackDestinationVolume(OpenStackVolumeBase):
+class OpenStackDestinationVolume(OpenstackVolumeTransfer):
     def __init__(self, openstack_connection, destination_conversion_host_id,
                  ssh_key_path, ssh_user, transfer_uuid, source_conversion_host_address,
                  volume_map, destination_conversion_host_address=None,
