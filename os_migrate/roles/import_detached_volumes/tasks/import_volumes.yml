@@ -42,3 +42,21 @@
   register: transfer
   when:
     - item["_migration_params"]["data_copy"]|default(true)
+
+- name: clean up in the source cloud after migration
+  os_migrate.os_migrate.import_volumes_src_cleanup:
+    cloud: src
+    validate_certs: "{{ os_migrate_src_validate_certs|default(omit) }}"
+    ca_cert: "{{ os_migrate_src_ca_cert|default(omit) }}"
+    client_cert: "{{ os_migrate_src_client_cert|default(omit) }}"
+    client_key: "{{ os_migrate_src_client_key|default(omit) }}"
+    conversion_host: "{{ os_src_conversion_host_info.openstack_conversion_host }}"
+    ssh_key_path: "{{ os_migrate_conversion_keypair_private_path }}"
+    ssh_user: "{{ os_migrate_conversion_host_ssh_user }}"
+    transfer_uuid: "{{ exports.transfer_uuid }}"
+    volume_map: "{{ exports.volume_map }}"
+    log_file: "{{ exports.log_file }}"
+    state_file: "{{ exports.state_file }}"
+    timeout: "{{ os_migrate_timeout }}"
+  when:
+    - item["_migration_params"]["data_copy"]|default(true)

@@ -200,27 +200,10 @@ class OpenStackVolumeBase():
         and fill in dest_id with the new volumes.
         """
         self.log.info('Creating volumes on destination cloud')
-        for path, mapping in self.volume_map.items():
-            sdk_params = {
-                'name': mapping['name'],
-                'bootable': mapping['bootable'],
-                'size': mapping['size'],
-                'wait': True,
-                'timeout': self.timeout,
-            }
-            # sdk_params.update(self.volume.sdk_params(self.conn))
-            sdk_params.pop('volume_type', None)
-            new_volume = self.conn.create_volume(**sdk_params)
-            self.volume_map[path]['dest_id'] = new_volume.id
-
-    def _create_destination_volumes_vm(self):
-        """
-        Volume mapping step 5: create new volumes on the destination OpenStack,
-        and fill in dest_id with the new volumes.
-        """
-        self.log.info('Creating volumes on destination cloud')
-        volumes = list(map(ServerVolume.from_data, self.ser_server.params()['volumes']))
-        src_id_volumes = {vol.info()['id']: vol for vol in volumes}
+        attached_volumes = hasattr(self, 'ser_server')
+        if attached_volumes:
+            volumes = list(map(ServerVolume.from_data, self.ser_server.params()['volumes']))
+            src_id_volumes = {vol.info()['id']: vol for vol in volumes}
         for path, mapping in self.volume_map.items():
             source_id = mapping['source_id']
             sdk_params = {
@@ -230,19 +213,20 @@ class OpenStackVolumeBase():
                 'wait': True,
                 'timeout': self.timeout,
             }
-            if source_id in src_id_volumes:
-                sdk_params.update(src_id_volumes[source_id].sdk_params(self.conn))
-            elif path == '/dev/vda':
-                # This code path is exercised when the source VM has
-                # no boot volume but is being migrated with
-                # `boot_disk_copy: true` and a boot volume is being
-                # created in the destination.
-                # `None` value in boot_volume_params means we do not
-                # want to override that parameter.
-                boot_volume_params_defined = \
-                    dict(filter(lambda item: item[1] is not None,
-                                self.ser_server.migration_params()['boot_volume_params'].items()))
-                sdk_params.update(boot_volume_params_defined)
+            if attached_volumes:
+                if source_id in src_id_volumes:
+                    sdk_params.update(src_id_volumes[source_id].sdk_params(self.conn))
+                elif path == '/dev/vda':
+                    # This code path is exercised when the source VM has
+                    # no boot volume but is being migrated with
+                    # `boot_disk_copy: true` and a boot volume is being
+                    # created in the destination.
+                    # `None` value in boot_volume_params means we do not
+                    # want to override that parameter.
+                    boot_volume_params_defined = \
+                        dict(filter(lambda item: item[1] is not None,
+                                    self.ser_server.migration_params()['boot_volume_params'].items()))
+                    sdk_params.update(boot_volume_params_defined)
             sdk_params.pop('volume_type', None)
             new_volume = self.conn.create_volume(**sdk_params)
             self.volume_map[path]['dest_id'] = new_volume.id

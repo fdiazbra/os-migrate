@@ -333,7 +333,7 @@ class OpenStackDestinationVolume(OpenStackVolumeBase):
     def transfer_exports(self):
         try:
             self._create_forwarding_process()
-            self._create_destination_volumes_vm()
+            self._create_destination_volumes()
             self._attach_destination_volumes()
             self._convert_destination_volumes()
             self._detach_destination_volumes()
