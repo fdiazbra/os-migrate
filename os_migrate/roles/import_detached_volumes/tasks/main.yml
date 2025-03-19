@@ -26,7 +26,6 @@
     name: os_migrate.os_migrate.conversion_host
     tasks_from: conv_host_details.yml
 
-
 - name: import volumes
   ansible.builtin.include_tasks: import_volumes.yml
   vars:
