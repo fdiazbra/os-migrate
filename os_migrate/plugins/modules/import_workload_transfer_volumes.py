@@ -291,12 +291,12 @@ except ImportError:
 from ansible_collections.os_migrate.os_migrate.plugins.module_utils import server
 
 from ansible_collections.os_migrate.os_migrate.plugins.module_utils.volume_common \
-    import OpenStackVolumeBase, DEFAULT_TIMEOUT
+    import OpenstackVolumeTransfer, DEFAULT_TIMEOUT
 
 import re
 
 
-class OpenStackDestinationVolume(OpenStackVolumeBase):
+class OpenStackDestinationVolume(OpenstackVolumeTransfer):
     def __init__(self, openstack_connection, destination_conversion_host_id,
                  ssh_key_path, ssh_user, transfer_uuid, source_conversion_host_address,
                  volume_map, ser_server, destination_conversion_host_address=None,

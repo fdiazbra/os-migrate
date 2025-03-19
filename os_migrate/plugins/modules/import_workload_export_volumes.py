@@ -251,12 +251,12 @@ from ansible_collections.os_migrate.os_migrate.plugins.module_utils \
     import server
 
 from ansible_collections.os_migrate.os_migrate.plugins.module_utils.volume_common \
-    import DEFAULT_TIMEOUT, OpenStackVolumeBase
+    import DEFAULT_TIMEOUT, OpenstackVolumeExport
 
 import uuid
 
 
-class OpenStackSourceVolume(OpenStackVolumeBase):
+class OpenStackSourceVolume(OpenstackVolumeExport):
     """ Export volumes from an OpenStack instance over NBD. """
 
     def __init__(self, openstack_connection, source_conversion_host_id,
