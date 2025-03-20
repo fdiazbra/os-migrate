@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
@@ -95,18 +96,19 @@ data:
   description: volumes imported
   returned: Only on success.
   type: list
-  sample:   - _info:
-                attachments: []
-                id: 0e9ff1ab-fb8d-4c12-81c4-29d519d09cb9
-                is_bootable: false
-                size: 5
-              _migration_params: {}
-              params:
-                availability_zone: nova
-                description: null
-                name: test-detached
-                volume_type: tripleo
-              type: openstack.network.ServerVolume
+  sample:
+    - _info:
+        attachments: []
+        id: 0e9ff1ab-fb8d-4c12-81c4-29d519d09cb9
+        is_bootable: false
+        size: 5
+      _migration_params:
+        params:
+        availability_zone: nova
+        description: null
+        name: test-detached
+        volume_type: tripleo
+      type: openstack.network.ServerVolume
 
 log_file:
   description: log file path
