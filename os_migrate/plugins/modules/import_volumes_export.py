@@ -11,7 +11,7 @@ ANSIBLE_METADATA = {
 
 DOCUMENTATION = '''
 ---
-module: import_workload_export_volumes
+module: import_volumes_export_volumes
 
 short_description: Create NBD exports of OpenStack volumes
 
@@ -22,7 +22,7 @@ version_added: "2.9.0"
 author: "OpenStack tenant migration tools (@os-migrate)"
 
 description:
-  - "Take an instance from an OS-Migrate YAML structure, and export its volumes over NBD."
+  - "Take a volume from an OS-Migrate YAML structure, and export its volumes over NBD."
 
 options:
   auth:
@@ -35,32 +35,12 @@ options:
       - Auth type plugin for destination OpenStack cloud. Can be omitted if using password authentication.
     required: false
     type: str
-  region_name:
-    description:
-      - Destination OpenStack region name. Can be omitted if using default region.
-    required: false
-    type: str
-  availability_zone:
-    description:
-      - Availability zone.
-    required: false
-    type: str
   cloud:
     description:
       - Cloud resource from clouds.yml
       - Required if 'auth' param not used
     required: false
     type: raw
-  validate_certs:
-    description:
-      - Validate HTTPS certificates when logging in to OpenStack.
-    required: false
-    type: bool
-  boot_volume_prefix:
-    description:
-      - Name prefix to apply when server boot volume copies are created.
-    required: false
-    type: str
   conversion_host:
     description:
       - Dictionary with information about the source conversion host (address, status, name, id)
@@ -68,25 +48,9 @@ options:
     type: dict
   data:
     description:
-      - Data structure with server parameters as loaded from OS-Migrate workloads YAML file.
+      - Data structure with server parameters as loaded from OS-Migrate volumes YAML file.
     required: true
     type: dict
-  log_file:
-    description:
-      - Path to store a log file for this conversion process.
-    required: false
-    type: str
-  state_file:
-    description:
-      - Path to store a transfer progress file for this conversion process.
-    required: false
-    type: str
-  src_conversion_host_address:
-    description:
-      - Optional IP address of the source conversion host. Without this, the
-        plugin will use the 'access_ipv4' property of the conversion host instance.
-    required: false
-    type: str
   ssh_key_path:
     description:
       - Path to an SSH private key authorized on the source cloud.
@@ -95,6 +59,11 @@ options:
   ssh_user:
     description:
       - The SSH user to connect to the conversion hosts.
+    required: true
+    type: str
+  log_dir:
+    description:
+      - Complete path for log folder.
     required: true
     type: str
   timeout:
@@ -106,112 +75,57 @@ options:
 '''
 
 EXAMPLES = '''
-main.yml:
+import_volumes.yml:
 
-- name: validate loaded resources
-  os_migrate.os_migrate.validate_resource_files:
-    paths:
-      - "{{ os_migrate_data_dir }}/workloads.yml"
-  register: workloads_file_validation
-  when: import_workloads_validate_file
-
-- name: read workloads resource file
-  os_migrate.os_migrate.read_resources:
-    path: "{{ os_migrate_data_dir }}/workloads.yml"
-  register: read_workloads
-
-- name: get source conversion host address
-  os_migrate.os_migrate.os_conversion_host_info:
-    auth:
-        auth_url: https://src-osp:13000/v3
-        username: migrate
-        password: migrate
-        project_domain_id: default
-        project_name: migration-source
-        user_domain_id: default
-    server_id: ce4dda96-5d8e-4b67-aee2-9845cdc943fe
-  register: os_src_conversion_host_info
-
-- name: get destination conversion host address
-  os_migrate.os_migrate.os_conversion_host_info:
-    auth:
-        auth_url: https://dest-osp:13000/v3
-        username: migrate
-        password: migrate
-        project_domain_id: default
-        project_name: migration-destination
-        user_domain_id: default
-    server_id: 2d2afe57-ace5-4187-8fca-5f10f9059ba1
-  register: os_dst_conversion_host_info
-
-- name: import workloads
-  include_tasks: workload.yml
-  loop: "{{ read_workloads.resources }}"
-
-
-
-workload.yml:
-
-- block:
-  - name: preliminary setup for workload import
-    os_migrate.os_migrate.import_workload_prelim:
-      auth:
-          auth_url: https://dest-osp:13000/v3
-          username: migrate
-          password: migrate
-          project_domain_id: default
-          project_name: migration-destination
-          user_domain_id: default
-      validate_certs: False
-      src_conversion_host: "{{ os_src_conversion_host_info.openstack_conversion_host }}"
-      src_auth:
-          auth_url: https://src-osp:13000/v3
-          username: migrate
-          password: migrate
-          project_domain_id: default
-          project_name: migration-source
-          user_domain_id: default
-      src_validate_certs: False
-      data: "{{ item }}"
-      data_dir: "{{ os_migrate_data_dir }}"
-    register: prelim
-
-  - debug:
-      msg:
-        - "{{ prelim.server_name }} log file: {{ prelim.log_file }}"
-        - "{{ prelim.server_name }} progress file: {{ prelim.state_file }}"
-    when: prelim.changed
-
-  - name: expose source volumes
-    os_migrate.os_migrate.import_workload_export_volumes:
-      auth: "{{ os_migrate_src_auth }}"
-      auth_type: "{{ os_migrate_src_auth_type|default(omit) }}"
-      region_name: "{{ os_migrate_src_region_name|default(omit) }}"
-      validate_certs: "{{ os_migrate_src_validate_certs|default(omit) }}"
-      ca_cert: "{{ os_migrate_src_ca_cert|default(omit) }}"
-      client_cert: "{{ os_migrate_src_client_cert|default(omit) }}"
-      client_key: "{{ os_migrate_src_client_key|default(omit) }}"
-      conversion_host:
-        "{{ os_src_conversion_host_info.openstack_conversion_host }}"
-      data: "{{ item }}"
-      log_file: "{{ os_migrate_data_dir }}/{{ prelim.server_name }}.log"
-      state_file: "{{ os_migrate_data_dir }}/{{ prelim.server_name }}.state"
-      ssh_key_path: "{{ os_migrate_conversion_keypair_private_path }}"
-      ssh_user: "{{ os_migrate_conversion_host_ssh_user  }}"
-    register: volume_map
-    when: prelim.changed
-
-  rescue:
-    - fail:
-        msg: "Failed to import {{ item.params.name }}!"
+- name: expose source volume
+  os_migrate.os_migrate.import_volumes_export:
+    cloud: "{{ cloud_vars_src }}"
+    conversion_host:
+      "{{ os_src_conversion_host_info.openstack_conversion_host }}"
+    data: "{{ detached_volumes }}"
+    ssh_key_path: "{{ os_migrate_conversion_keypair_private_path }}"
+    ssh_user: "{{ os_migrate_conversion_host_ssh_user }}"
+    log_dir: "{{ os_migrate_data_dir }}/volume_logs"
+    timeout: "{{ os_migrate_timeout }}"
+  register: exports
 '''
 
 RETURN = '''
+data:
+  description: volumes imported
+  returned: Only on success.
+  type: list
+  sample:   - _info:
+                attachments: []
+                id: 0e9ff1ab-fb8d-4c12-81c4-29d519d09cb9
+                is_bootable: false
+                size: 5
+              _migration_params: {}
+              params:
+                availability_zone: nova
+                description: null
+                name: test-detached
+                volume_type: tripleo
+              type: openstack.network.ServerVolume
+
+log_file: 
+  description: log file path 
+  returned: Only on success.
+  type: str
+  sample: /root/os_migrate/tests/e2e/tmp/data/volume_logs/detached_volumes.log
+
+state_file: 
+  description: transfer progress file for this conversion process.
+  returned: Only on success.
+  type: str
+  sample: /root/os_migrate/tests/e2e/tmp/data/volume_logs/detached_volumes.state
+
 transfer_uuid:
   description: UUID to identify this transfer when needed
   returned: Only on success.
   type: str
   sample: 9b8a64b3-c976-4103-b34e-995e4ab9f57b
+
 volume_map:
   description:
     - Mapping of source volume devices to NBD export URLs.
@@ -219,22 +133,21 @@ volume_map:
   returned: Only after successfully moving volumes on source cloud.
   type: dict
   sample:
-    "volume_map": {
-          "/dev/vda": {
-              "bootable": True,
-              "dest_dev": null,
-              "dest_id": null,
-              "image_id": null,
-              "name": "migration-vm-boot",
-              "port": 49164,
-              "progress": 0.0,
-              "size": 10,
-              "snap_id": "52aa3444-6d22-4348-8cc7-5146a1fb9762",
-              "source_dev": "/dev/vdb",
-              "source_id": "ac62dcda-181d-4491-aa40-de60aa5918f3",
-              "url": "nbd://localhost:49164/f544092c-6bb8-4e3e-b509-d59b1520540d"
-          }
-     }
+    volume_map:
+      0e9ff1ab-fb8d-4c12-81c4-29d519d09cb9:
+      bootable: false
+      dest_dev: null
+      dest_id: null
+      image_id: null
+      name: test-detached3
+      port: 49166
+      progress: 0.0
+      size: 5
+      snap_id: null
+      source_dev: /dev/vdb
+      source_id: 0e9ff1ab-fb8d-4c12-81c4-29d519d09cb9
+      url: null
+    
 '''
 
 from ansible.module_utils.basic import AnsibleModule

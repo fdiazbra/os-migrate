@@ -95,7 +95,7 @@ class OpenStackVolumeBase():
         # Optional parameters:
         # conversion_host_address: Optional address used to override 'access_ipv4'
         # state_file: File to hold current disk transfer state
-        # log_file: Debug log path for workload migration
+        # log_file: Debug log path for volume migration
         self.conversion_host_address = conversion_host_address
         self.state_file = state_file
         self.log_file = log_file
