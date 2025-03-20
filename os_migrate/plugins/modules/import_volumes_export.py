@@ -108,13 +108,13 @@ data:
                 volume_type: tripleo
               type: openstack.network.ServerVolume
 
-log_file: 
-  description: log file path 
+log_file:
+  description: log file path
   returned: Only on success.
   type: str
   sample: /root/os_migrate/tests/e2e/tmp/data/volume_logs/detached_volumes.log
 
-state_file: 
+state_file:
   description: transfer progress file for this conversion process.
   returned: Only on success.
   type: str
@@ -147,7 +147,6 @@ volume_map:
       source_dev: /dev/vdb
       source_id: 0e9ff1ab-fb8d-4c12-81c4-29d519d09cb9
       url: null
-    
 '''
 
 from ansible.module_utils.basic import AnsibleModule
